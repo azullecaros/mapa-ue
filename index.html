@@ -1,63 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Mapa Universo Expansivo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+<meta charset="utf-8" />
+<title>Mapa UE — Regiones de Chile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet" />
 <style>
-  body { margin: 0; padding: 0; }
-  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  html,body {height:100%;margin:0}
+  body {background:#F1F1F1;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial}
+  #map{position:absolute;inset:0}
+
+  /* Popup estilo tarjeta */
+  .mapboxgl-popup{max-width:860px}
+  .mapboxgl-popup-content{
+    border-radius:22px; padding:20px 22px; box-shadow:0 10px 30px rgba(0,0,0,.15)
+  }
+  .ux-popup h2{margin:0 0 14px; font:800 24px/1.15 system-ui; color:#201245}
+  .ux-cards{display:flex; gap:12px}
+  .ux-card{flex:1; border-radius:18px; text-align:center; padding:16px 10px; color:#201245}
+  .ux-card h3{margin:0 0 6px; font:800 24px/1 system-ui}
+  .ux-card p{margin:0; font:14px/1.35 system-ui; color:#1e1e1e}
 </style>
 </head>
 <body>
-
 <div id="map"></div>
 
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
 <script>
-// Token de acceso de Mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
+  // Token público
+  mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
-// Inicializar el mapa
-const map = new mapboxgl.Map({
+  const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [-70.6693, -33.4489], // Santiago, Chile
-    zoom: 4
-});
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-70.67, -33.45],
+    zoom: 4.4,
+    hash: true
+  });
 
-// Cargar datos GeoJSON desde el repositorio
-map.on('load', () => {
-    map.addSource('centros', {
-        type: 'geojson',
-        data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
+  // Intento suavizar colores base para acercarnos a #F1F1F1 (fondo) y #C3C3C3 (tierra)
+  map.on('styledata', () => {
+    if (map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#F1F1F1');
+    ['land','landuse','landcover'].forEach(id=>{
+      if (map.getLayer(id)) try { map.setPaintProperty(id,'fill-color','#C3C3C3'); } catch(e){}
+    });
+    if (map.getLayer('water')) try { map.setPaintProperty('water','fill-color','#F1F1F1'); } catch(e){}
+  });
+
+  // total = manuales + maleta + mobilelab
+  const TOTAL = ['+', ['get','manuales'], ['+', ['get','maleta'], ['get','mobilelab']]];
+
+  map.on('load', () => {
+    // Fuente: tu GeoJSON publicado en GitHub Pages
+    map.addSource('regiones-centros', {
+      type: 'geojson',
+      data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
     });
 
+    // Círculos lilas con radio proporcional al total
     map.addLayer({
-        id: 'centros-layer',
-        type: 'circle',
-        source: 'centros',
-        paint: {
-            'circle-radius': 6,
-            'circle-color': '#ff0000'
-        }
+      id: 'centros-circulos',
+      type: 'circle',
+      source: 'regiones-centros',
+      paint: {
+        'circle-color': '#E2D2F6',
+        'circle-stroke-color': '#201245',
+        'circle-stroke-width': 1.5,
+        'circle-radius': [
+          'interpolate', ['linear'], TOTAL,
+          0, 10,
+          300, 16,
+          800, 22,
+          1600, 30,
+          2600, 40
+        ]
+      }
     });
 
-    // Popup con información
-    map.on('click', 'centros-layer', (e) => {
-        const props = e.features[0].properties;
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(`<strong>${props["región"]}</strong><br>Manuales: ${props.manuales}<br>Maleta: ${props.maleta}<br>MobileLab: ${props.mobilelab}`)
-            .addTo(map);
+    // Número total centrado
+    map.addLayer({
+      id: 'centros-texto',
+      type: 'symbol',
+      source: 'regiones-centros',
+      layout: {
+        'text-field': ['to-string', TOTAL],
+        'text-size': 13,
+        'text-font': ['Open Sans Bold','Arial Unicode MS Bold'],
+        'text-allow-overlap': true,
+        'text-ignore-placement': true
+      },
+      paint: {
+        'text-color': '#201245',
+        'text-halo-color': '#FFFFFF',
+        'text-halo-width': 0.6
+      }
     });
 
-    map.on('mouseenter', 'centros-layer', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'centros-layer', () => { map.getCanvas().style.cursor = ''; });
-});
+    // Popup con tus 3 cajas
+    map.on('click', 'centros-circulos', (e) => {
+      const p = e.features[0].properties;
+      const nombre = p['región'];
+      const man = Number(p['manuales']||0);
+      const mal = Number(p['maleta']||0);
+      const mob = Number(p['mobilelab']||0);
+
+      const html = `
+        <div class="ux-popup">
+          <h2>${nombre}</h2>
+          <div class="ux-cards">
+            <div class="ux-card" style="background:#E2D2F6;">
+              <h3>${man}</h3><p>usuarios de <strong>Manuales</strong></p>
+            </div>
+            <div class="ux-card" style="background:#89ACDB;">
+              <h3>${mal}</h3><p>usuarios de <strong>Maleta</strong></p>
+            </div>
+            <div class="ux-card" style="background:#A3D7DE;">
+              <h3>${mob}</h3><p>usuarios de <strong>MobileLab</strong></p>
+            </div>
+          </div>
+        </div>`;
+      new mapboxgl.Popup({ offset:16, closeButton:true, maxWidth:'860px' })
+        .setLngLat(e.lngLat).setHTML(html).addTo(map);
+    });
+
+    map.on('mouseenter','centros-circulos',()=>map.getCanvas().style.cursor='pointer');
+    map.on('mouseleave','centros-circulos',()=>map.getCanvas().style.cursor='');
+  });
 </script>
-
 </body>
 </html>
 
