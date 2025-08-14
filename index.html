@@ -9,9 +9,9 @@
     html, body { margin:0; height:100%; background:#F1F1F1; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial }
     #map { position:absolute; inset:0 }
 
-    /* Toolbar (debajo del zoom) */
+    /* Toolbar izquierda (debajo del logo/aire) */
     .toolbar {
-      position:absolute; top:76px; right:10px; z-index:2;
+      position:absolute; top:76px; left:10px; z-index:2;
       display:flex; gap:8px; background:#fff; padding:6px; border-radius:10px;
       box-shadow:0 6px 16px rgba(0,0,0,.12);
     }
@@ -20,6 +20,16 @@
       background:#f3f3f3; font:600 12px/1 system-ui; color:#222;
     }
     .toolbar button.active { background:#201245; color:#fff }
+
+    /* Leyenda abajo-izquierda */
+    .legend {
+      position:absolute; left:10px; bottom:12px; z-index:2;
+      background:#fff; border-radius:10px; padding:8px 10px; box-shadow:0 6px 16px rgba(0,0,0,.12);
+      font:12px/1.2 system-ui; color:#333; display:none; align-items:center; gap:8px;
+    }
+    .legend-dot {
+      width:10px; height:10px; border-radius:50%; background:#D9D9D9; display:inline-block;
+    }
 
     /* Popup */
     .mapboxgl-popup{ max-width:860px }
@@ -34,10 +44,15 @@
 <body>
   <div id="map"></div>
 
-  <!-- Filtro UI -->
+  <!-- Filtro UI (izquierda) -->
   <div class="toolbar">
     <button id="btnActivos" class="active" title="Oculta regiones con 0">Solo con actividad</button>
     <button id="btnTodos" title="Muestra también las regiones con 0">Mostrar todo</button>
+  </div>
+
+  <!-- Leyenda (aparece solo en “Mostrar todo”) -->
+  <div id="legend" class="legend">
+    <span class="legend-dot"></span> Puntos grises: 0 casos
   </div>
 
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -45,7 +60,7 @@
   // Token público
   mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
-  // Mapa + controles (zoom top-right, atribución compacta bottom-right)
+  // Mapa + controles (zoom top-right, atribución compact bottom-right)
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
@@ -57,19 +72,19 @@
   map.addControl(new mapboxgl.NavigationControl({ showCompass:false }), 'top-right');
   map.addControl(new mapboxgl.AttributionControl({ compact:true }), 'bottom-right');
 
-  // Expresiones robustas (conversión a número)
+  // Expresiones robustas (convierte a número)
   const T_MAN = ['to-number', ['get','manuales'], 0];
   const T_MAL = ['to-number', ['get','maleta'], 0];
   const T_MOB = ['to-number', ['get','mobilelab'], 0];
   const TOTAL  = ['+', T_MAN, ['+', T_MAL, T_MOB]];
 
-  // Anti-caché para siempre traer el último GeoJSON
+  // Anti-caché para tener siempre la última versión del GeoJSON
   const DATA_URL = 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson?v=' + Date.now();
 
   map.on('load', () => {
     map.addSource('regiones-centros', { type:'geojson', data: DATA_URL });
 
-    // Círculos: lila si total>0, gris claro si total=0; sin borde
+    // Círculos: lila si total>0, gris si total=0; sin borde
     map.addLayer({
       id: 'centros-circulos',
       type: 'circle',
@@ -84,7 +99,7 @@
       }
     });
 
-    // Número total: no mostrar texto si total=0; color #201245
+    // Número total centrado (#201245). Si total=0, no muestra texto
     map.addLayer({
       id: 'centros-texto',
       type: 'symbol',
@@ -103,7 +118,7 @@
       }
     });
 
-    // Popup con salto de línea antes del nombre para alinear
+    // Popup con salto de línea para alinear
     map.on('click', 'centros-circulos', (e) => {
       const p = e.features[0].properties;
       const man = Number(p['manuales']||0);
@@ -133,19 +148,22 @@
     map.on('mouseenter','centros-circulos',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','centros-circulos',()=>map.getCanvas().style.cursor='');
 
-    // --- Filtro Solo con actividad / Mostrar todo ---
+    // --- Filtro: Solo con actividad / Mostrar todo ---
     const btnActivos = document.getElementById('btnActivos');
     const btnTodos   = document.getElementById('btnTodos');
+    const legendEl   = document.getElementById('legend');
 
     function setOnlyActive(onlyActive){
       if (onlyActive) {
         map.setFilter('centros-circulos', ['>', TOTAL, 0]);
         map.setFilter('centros-texto',   ['>', TOTAL, 0]);
         btnActivos.classList.add('active'); btnTodos.classList.remove('active');
+        legendEl.style.display = 'none';
       } else {
         map.setFilter('centros-circulos', null);
         map.setFilter('centros-texto',   null);
         btnTodos.classList.add('active'); btnActivos.classList.remove('active');
+        legendEl.style.display = 'flex';
       }
     }
     // Estado inicial: solo con actividad
@@ -157,6 +175,7 @@
   </script>
 </body>
 </html>
+
 
 
 
