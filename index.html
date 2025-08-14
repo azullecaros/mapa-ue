@@ -4,13 +4,10 @@
   <meta charset="utf-8" />
   <title>Mapa UE — Regiones de Chile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Mapbox GL JS -->
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     html, body { margin:0; height:100%; background:#F1F1F1; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial }
     #map { position:absolute; inset:0 }
-    /* Popup */
     .mapboxgl-popup{ max-width:860px }
     .mapboxgl-popup-content{ border-radius:22px; padding:20px 22px; box-shadow:0 10px 30px rgba(0,0,0,.15) }
     .ux-popup h2{ margin:0 0 14px; font:800 24px/1.15 system-ui; color:#201245 }
@@ -25,10 +22,8 @@
 
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script>
-  // --- Token público ---
   mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
-  // Mapa
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
@@ -37,28 +32,28 @@
     hash: true
   });
 
-  // Expresión robusta: total = manuales + maleta + mobilelab (conversión a número)
+  // Botones de zoom arriba-izquierda (sin brújula)
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-left');
+
   const T_MAN = ['to-number', ['get','manuales'], 0];
   const T_MAL = ['to-number', ['get','maleta'], 0];
   const T_MOB = ['to-number', ['get','mobilelab'], 0];
   const TOTAL  = ['+', T_MAN, ['+', T_MAL, T_MOB]];
 
   map.on('load', () => {
-    // Fuente: tu GeoJSON público (URL absoluta)
     map.addSource('regiones-centros', {
       type: 'geojson',
       data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
     });
 
-    // Círculos lilas con radio proporcional al total
+    // Círculos SIN borde
     map.addLayer({
       id: 'centros-circulos',
       type: 'circle',
       source: 'regiones-centros',
       paint: {
         'circle-color': '#E2D2F6',
-        'circle-stroke-color': '#201245',
-        'circle-stroke-width': 1.5,
+        'circle-stroke-width': 0,
         'circle-radius': [
           'interpolate', ['linear'], TOTAL,
           0, 10,
@@ -89,26 +84,21 @@
       }
     });
 
-    // Popup con tus 3 tarjetas
+    // Popup
     map.on('click', 'centros-circulos', (e) => {
       const p = e.features[0].properties;
-      const nombre = p['región'];
-      const man = Number(p['manuales']||0);
-      const mal = Number(p['maleta']||0);
-      const mob = Number(p['mobilelab']||0);
-
       const html = `
         <div class="ux-popup">
-          <h2>${nombre}</h2>
+          <h2>${p['región']}</h2>
           <div class="ux-cards">
             <div class="ux-card" style="background:#E2D2F6;">
-              <h3>${man}</h3><p>usuarios de <strong>Manuales</strong></p>
+              <h3>${Number(p['manuales']||0)}</h3><p>usuarios de <strong>Manuales</strong></p>
             </div>
             <div class="ux-card" style="background:#89ACDB;">
-              <h3>${mal}</h3><p>usuarios de <strong>Maleta</strong></p>
+              <h3>${Number(p['maleta']||0)}</h3><p>usuarios de <strong>Maleta</strong></p>
             </div>
             <div class="ux-card" style="background:#A3D7DE;">
-              <h3>${mob}</h3><p>usuarios de <strong>MobileLab</strong></p>
+              <h3>${Number(p['mobilelab']||0)}</h3><p>usuarios de <strong>MobileLab</strong></p>
             </div>
           </div>
         </div>`;
@@ -119,11 +109,9 @@
     map.on('mouseenter','centros-circulos',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','centros-circulos',()=>map.getCanvas().style.cursor='');
   });
-
-  // Mostrar errores en consola si algo fallara
-  window.addEventListener('error', e => console.error('ERROR:', e.message));
   </script>
 </body>
 </html>
+
 
 
