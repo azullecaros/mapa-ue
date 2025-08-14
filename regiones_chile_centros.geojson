@@ -6,9 +6,9 @@
       "type": "Feature",
       "properties": {
         "región": "Arica y Parinacota",
-        "manuales": 120,
-        "maleta": 45,
-        "mobilelab": 30
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -22,9 +22,9 @@
       "type": "Feature",
       "properties": {
         "región": "Tarapacá",
-        "manuales": 180,
-        "maleta": 70,
-        "mobilelab": 50
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -38,9 +38,9 @@
       "type": "Feature",
       "properties": {
         "región": "Antofagasta",
-        "manuales": 300,
-        "maleta": 110,
-        "mobilelab": 80
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -54,9 +54,9 @@
       "type": "Feature",
       "properties": {
         "región": "Atacama",
-        "manuales": 160,
-        "maleta": 60,
-        "mobilelab": 45
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -70,9 +70,9 @@
       "type": "Feature",
       "properties": {
         "región": "Coquimbo",
-        "manuales": 420,
-        "maleta": 150,
-        "mobilelab": 110
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -86,9 +86,9 @@
       "type": "Feature",
       "properties": {
         "región": "Valparaíso",
-        "manuales": 680,
-        "maleta": 260,
-        "mobilelab": 180
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -102,9 +102,9 @@
       "type": "Feature",
       "properties": {
         "región": "Metropolitana de Santiago",
-        "manuales": 2200,
+        "manuales": 0,
         "maleta": 772,
-        "mobilelab": 650
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -118,9 +118,9 @@
       "type": "Feature",
       "properties": {
         "región": "Libertador General Bernardo O'Higgins",
-        "manuales": 520,
-        "maleta": 190,
-        "mobilelab": 140
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -134,9 +134,9 @@
       "type": "Feature",
       "properties": {
         "región": "Maule",
-        "manuales": 390,
-        "maleta": 150,
-        "mobilelab": 120
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -150,9 +150,9 @@
       "type": "Feature",
       "properties": {
         "región": "Ñuble",
-        "manuales": 260,
-        "maleta": 100,
-        "mobilelab": 80
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -166,9 +166,9 @@
       "type": "Feature",
       "properties": {
         "región": "Biobío",
-        "manuales": 780,
-        "maleta": 320,
-        "mobilelab": 220
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -182,9 +182,9 @@
       "type": "Feature",
       "properties": {
         "región": "La Araucanía",
-        "manuales": 520,
-        "maleta": 230,
-        "mobilelab": 170
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -198,9 +198,9 @@
       "type": "Feature",
       "properties": {
         "región": "Los Ríos",
-        "manuales": 300,
-        "maleta": 130,
-        "mobilelab": 95
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -214,9 +214,9 @@
       "type": "Feature",
       "properties": {
         "región": "Los Lagos",
-        "manuales": 520,
-        "maleta": 210,
-        "mobilelab": 160
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -230,9 +230,9 @@
       "type": "Feature",
       "properties": {
         "región": "Aysén del General Carlos Ibáñez del Campo",
-        "manuales": 90,
-        "maleta": 40,
-        "mobilelab": 28
+        "manuales": 0,
+        "maleta": 0,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
@@ -246,9 +246,9 @@
       "type": "Feature",
       "properties": {
         "región": "Magallanes y de la Antártica Chilena",
-        "manuales": 80,
-        "maleta": 35,
-        "mobilelab": 25
+        "manuales": 0,
+        "maleta": 652,
+        "mobilelab": 0
       },
       "geometry": {
         "type": "Point",
