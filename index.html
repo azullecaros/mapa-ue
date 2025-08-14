@@ -31,7 +31,7 @@
   // Token público
   mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
-  // Mapa (desactivamos attribution por defecto para ponerla compacta luego)
+  // Mapa (atribución compacta luego)
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
@@ -41,26 +41,24 @@
     attributionControl: false
   });
 
-  // Botones de zoom ARRIBA-DERECHA (sin brújula)
+  // Controles: zoom arriba-derecha, atribución compacta abajo-derecha
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-  // Attribution compacta (icono “i”) ABAJO-DERECHA
   map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
 
-  // Expresión robusta del total
+  // total = manuales + maleta + mobilelab (conversión robusta a número)
   const T_MAN = ['to-number', ['get','manuales'], 0];
   const T_MAL = ['to-number', ['get','maleta'], 0];
   const T_MOB = ['to-number', ['get','mobilelab'], 0];
   const TOTAL  = ['+', T_MAN, ['+', T_MAL, T_MOB]];
 
   map.on('load', () => {
-    // Fuente: tu GeoJSON publicado
+    // Fuente: tu GeoJSON público
     map.addSource('regiones-centros', {
       type: 'geojson',
       data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
     });
 
-    // Círculos LILA sin borde, tamaño por TOTAL
+    // Círculos lila SIN borde (radio proporcional al total)
     map.addLayer({
       id: 'centros-circulos',
       type: 'circle',
@@ -79,7 +77,7 @@
       }
     });
 
-    // Número TOTAL centrado en #201245
+    // Número total centrado (color #201245)
     map.addLayer({
       id: 'centros-texto',
       type: 'symbol',
@@ -98,7 +96,7 @@
       }
     });
 
-    // Popup con 3 tarjetas de color
+    // Popup con salto de línea antes del nombre (alineado en las tres tarjetas)
     map.on('click', 'centros-circulos', (e) => {
       const p = e.features[0].properties;
       const nombre = p['región'];
@@ -111,13 +109,16 @@
           <h2>${nombre}</h2>
           <div class="ux-cards">
             <div class="ux-card" style="background:#E2D2F6;">
-              <h3>${man}</h3><p>usuarios de <strong>Manuales</strong></p>
+              <h3>${man}</h3>
+              <p>usuarios de<br><strong>Manuales</strong></p>
             </div>
             <div class="ux-card" style="background:#89ACDB;">
-              <h3>${mal}</h3><p>usuarios de <strong>Maleta</strong></p>
+              <h3>${mal}</h3>
+              <p>usuarios de<br><strong>Maleta</strong></p>
             </div>
             <div class="ux-card" style="background:#A3D7DE;">
-              <h3>${mob}</h3><p>usuarios de <strong>MobileLab</strong></p>
+              <h3>${mob}</h3>
+              <p>usuarios de<br><strong>MobileLab</strong></p>
             </div>
           </div>
         </div>`;
@@ -131,6 +132,7 @@
   </script>
 </body>
 </html>
+
 
 
 
