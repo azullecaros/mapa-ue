@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<title>Mapa UE — Regiones de Chile</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet" />
-<style>
-  html,body {height:100%;margin:0}
-  body {background:#F1F1F1;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial}
-  #map{position:absolute;inset:0}
+  <meta charset="utf-8" />
+  <title>Mapa UE — Regiones de Chile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  /* Popup estilo tarjeta */
-  .mapboxgl-popup{max-width:860px}
-  .mapboxgl-popup-content{
-    border-radius:22px; padding:20px 22px; box-shadow:0 10px 30px rgba(0,0,0,.15)
-  }
-  .ux-popup h2{margin:0 0 14px; font:800 24px/1.15 system-ui; color:#201245}
-  .ux-cards{display:flex; gap:12px}
-  .ux-card{flex:1; border-radius:18px; text-align:center; padding:16px 10px; color:#201245}
-  .ux-card h3{margin:0 0 6px; font:800 24px/1 system-ui}
-  .ux-card p{margin:0; font:14px/1.35 system-ui; color:#1e1e1e}
-</style>
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+  <style>
+    html, body { margin:0; height:100%; background:#F1F1F1; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial }
+    #map { position:absolute; inset:0 }
+    /* Popup */
+    .mapboxgl-popup{ max-width:860px }
+    .mapboxgl-popup-content{ border-radius:22px; padding:20px 22px; box-shadow:0 10px 30px rgba(0,0,0,.15) }
+    .ux-popup h2{ margin:0 0 14px; font:800 24px/1.15 system-ui; color:#201245 }
+    .ux-cards{ display:flex; gap:12px }
+    .ux-card{ flex:1; border-radius:18px; text-align:center; padding:16px 10px; color:#201245 }
+    .ux-card h3{ margin:0 0 6px; font:800 24px/1 system-ui }
+    .ux-card p{ margin:0; font:14px/1.35 system-ui; color:#1e1e1e }
+  </style>
 </head>
 <body>
-<div id="map"></div>
+  <div id="map"></div>
 
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
-<script>
-  // Token público
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script>
+  // --- Token público ---
   mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
+  // Mapa
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
@@ -38,20 +37,14 @@
     hash: true
   });
 
-  // Intento suavizar colores base para acercarnos a #F1F1F1 (fondo) y #C3C3C3 (tierra)
-  map.on('styledata', () => {
-    if (map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#F1F1F1');
-    ['land','landuse','landcover'].forEach(id=>{
-      if (map.getLayer(id)) try { map.setPaintProperty(id,'fill-color','#C3C3C3'); } catch(e){}
-    });
-    if (map.getLayer('water')) try { map.setPaintProperty('water','fill-color','#F1F1F1'); } catch(e){}
-  });
-
-  // total = manuales + maleta + mobilelab
-  const TOTAL = ['+', ['get','manuales'], ['+', ['get','maleta'], ['get','mobilelab']]];
+  // Expresión robusta: total = manuales + maleta + mobilelab (conversión a número)
+  const T_MAN = ['to-number', ['get','manuales'], 0];
+  const T_MAL = ['to-number', ['get','maleta'], 0];
+  const T_MOB = ['to-number', ['get','mobilelab'], 0];
+  const TOTAL  = ['+', T_MAN, ['+', T_MAL, T_MOB]];
 
   map.on('load', () => {
-    // Fuente: tu GeoJSON publicado en GitHub Pages
+    // Fuente: tu GeoJSON público (URL absoluta)
     map.addSource('regiones-centros', {
       type: 'geojson',
       data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
@@ -96,7 +89,7 @@
       }
     });
 
-    // Popup con tus 3 cajas
+    // Popup con tus 3 tarjetas
     map.on('click', 'centros-circulos', (e) => {
       const p = e.features[0].properties;
       const nombre = p['región'];
@@ -126,7 +119,10 @@
     map.on('mouseenter','centros-circulos',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','centros-circulos',()=>map.getCanvas().style.cursor='');
   });
-</script>
+
+  // Mostrar errores en consola si algo fallara
+  window.addEventListener('error', e => console.error('ERROR:', e.message));
+  </script>
 </body>
 </html>
 
