@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Mapa de Regiones de Chile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+  body { margin: 0; padding: 0; font-family: 'DIN', sans-serif; }
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; background-color: #F1F1F1; }
+  .mapboxgl-popup-content {
+    border-radius: 16px;
+    padding: 20px;
+    font-family: 'DIN', sans-serif;
+    max-width: 320px;
+  }
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #1C1130;
+    margin-bottom: 10px;
+  }
+  .popup-grid {
+    display: flex;
+    gap: 10px;
+  }
+  .popup-box {
+    flex: 1;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    color: #1C1130;
+  }
+  .popup-box strong {
+    font-size: 20px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
+
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11',
+  center: [-71, -38],
+  zoom: 4
+});
+
+map.on('load', () => {
+  map.addSource('regiones', {
+    type: 'vector',
+    url: 'mapbox://vhirschberg.69tq4hif'
+  });
+
+  // Círculos
+  map.addLayer({
+    id: 'puntos-regiones',
+    type: 'circle',
+    source: 'regiones',
+    'source-layer': 'regiones_chile_centros-3ktyh3',
+    paint: {
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['+', ['get', 'manuales'], ['+', ['get', 'maleta'], ['get', 'mobilelab']]],
+        0, 8,
+        200, 30
+      ],
+      'circle-color': '#E2D2F6',
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#201245'
+    }
+  });
+
+  // Texto centrado
+  map.addLayer({
+    id: 'labels-regiones',
+    type: 'symbol',
+    source: 'regiones',
+    'source-layer': 'regiones_chile_centros-3ktyh3',
+    layout: {
+      'text-field': [
+        'to-string',
+        ['+', ['get', 'manuales'], ['+', ['get', 'maleta'], ['get', 'mobilelab']]]
+      ],
+      'text-size': 12
+    },
+    paint: {
+      'text-color': '#201245'
+    }
+  });
+
+  // Popup
+  map.on('click', 'puntos-regiones', (e) => {
+    const props = e.features[0].properties;
+    const nombre = props['región'];
+    const manuales = Number(props['manuales']) || 0;
+    const maleta = Number(props['maleta']) || 0;
+    const mobile = Number(props['mobilelab']) || 0;
+
+    const popupHTML = `
+      <div class="popup-header">
+        ${nombre}
+        <span style="cursor:pointer;" onclick="this.closest('.mapboxgl-popup').remove()">×</span>
+      </div>
+      <div class="popup-grid">
+        <div class="popup-box" style="background:#E2D2F6;">
+          <strong>${manuales}</strong>
+          usuarios de<br>Manuales
+        </div>
+        <div class="popup-box" style="background:#89ACDB;">
+          <strong>${maleta}</strong>
+          usuarios de<br>Maleta
+        </div>
+        <div class="popup-box" style="background:#A3D7DE;">
+          <strong>${mobile}</strong>
+          usuarios de<br>MobileLab
+        </div>
+      </div>
+    `;
+
+    new mapboxgl.Popup({ closeButton: false })
+      .setLngLat(e.lngLat)
+      .setHTML(popupHTML)
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'puntos-regiones', () => {
+    map.getCanvas().style.cursor = 'pointer';
+  });
+  map.on('mouseleave', 'puntos-regiones', () => {
+    map.getCanvas().style.cursor = '';
+  });
+});
+</script>
+
+</body>
+</html>

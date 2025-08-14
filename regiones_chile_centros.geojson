@@ -1,0 +1,262 @@
+{
+  "type": "FeatureCollection",
+  "name": "regiones_chile_centros",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Arica y Parinacota",
+        "manuales": 120,
+        "maleta": 45,
+        "mobilelab": 30
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.304,
+          -18.478
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Tarapacá",
+        "manuales": 180,
+        "maleta": 70,
+        "mobilelab": 50
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.151,
+          -20.214
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Antofagasta",
+        "manuales": 300,
+        "maleta": 110,
+        "mobilelab": 80
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.4,
+          -23.65
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Atacama",
+        "manuales": 160,
+        "maleta": 60,
+        "mobilelab": 45
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.333,
+          -27.366
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Coquimbo",
+        "manuales": 420,
+        "maleta": 150,
+        "mobilelab": 110
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.25,
+          -29.904
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Valparaíso",
+        "manuales": 680,
+        "maleta": 260,
+        "mobilelab": 180
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.612,
+          -33.047
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Metropolitana de Santiago",
+        "manuales": 2200,
+        "maleta": 1100,
+        "mobilelab": 650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.669,
+          -33.449
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Libertador General Bernardo O'Higgins",
+        "manuales": 520,
+        "maleta": 190,
+        "mobilelab": 140
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.74,
+          -34.17
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Maule",
+        "manuales": 390,
+        "maleta": 150,
+        "mobilelab": 120
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.655,
+          -35.426
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Ñuble",
+        "manuales": 260,
+        "maleta": 100,
+        "mobilelab": 80
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.103,
+          -36.606
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Biobío",
+        "manuales": 780,
+        "maleta": 320,
+        "mobilelab": 220
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.05,
+          -36.827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "La Araucanía",
+        "manuales": 520,
+        "maleta": 230,
+        "mobilelab": 170
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.59,
+          -38.736
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Los Ríos",
+        "manuales": 300,
+        "maleta": 130,
+        "mobilelab": 95
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.245,
+          -39.819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Los Lagos",
+        "manuales": 520,
+        "maleta": 210,
+        "mobilelab": 160
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.942,
+          -41.469
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Aysén del General Carlos Ibáñez del Campo",
+        "manuales": 90,
+        "maleta": 40,
+        "mobilelab": 28
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.069,
+          -45.575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "región": "Magallanes y de la Antártica Chilena",
+        "manuales": 80,
+        "maleta": 35,
+        "mobilelab": 25
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.907,
+          -53.163
+        ]
+      }
+    }
+  ]
+}
