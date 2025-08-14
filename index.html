@@ -9,24 +9,25 @@
   html,body {height:100%;margin:0}
   body {background:#F1F1F1;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial}
   #map{position:absolute;inset:0}
-  #warn{position:fixed;left:12px;bottom:12px;background:#d32f2f;color:#fff;padding:8px 12px;border-radius:8px;
-        box-shadow:0 4px 14px rgba(0,0,0,.15);display:none;font-size:13px;z-index:5}
+
+  /* Popup */
   .mapboxgl-popup{max-width:860px}
-  .mapboxgl-popup-content{border-radius:22px;padding:20px 22px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
-  .ux-popup h2{margin:0 0 14px;font:800 24px/1.15 system-ui;color:#201245}
-  .ux-cards{display:flex;gap:12px}
-  .ux-card{flex:1;border-radius:18px;text-align:center;padding:16px 10px;color:#201245}
-  .ux-card h3{margin:0 0 6px;font:800 24px/1 system-ui}
-  .ux-card p{margin:0;font:14px/1.35 system-ui;color:#1e1e1e}
+  .mapboxgl-popup-content{
+    border-radius:22px; padding:20px 22px; box-shadow:0 10px 30px rgba(0,0,0,.15)
+  }
+  .ux-popup h2{margin:0 0 14px; font:800 24px/1.15 system-ui; color:#201245}
+  .ux-cards{display:flex; gap:12px}
+  .ux-card{flex:1; border-radius:18px; text-align:center; padding:16px 10px; color:#201245}
+  .ux-card h3{margin:0 0 6px; font:800 24px/1 system-ui}
+  .ux-card p{margin:0; font:14px/1.35 system-ui; color:#1e1e1e}
 </style>
 </head>
 <body>
 <div id="map"></div>
-<div id="warn">No encontré <code>regiones_chile_centros.geojson</code>. Usando el tileset de Mapbox.</div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
 <script>
-  // TOKEN (tu público)
+  // Token de tu cuenta
   mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
   const map = new mapboxgl.Map({
@@ -37,35 +38,63 @@
     hash: true
   });
 
-  // Helper: total = manuales + maleta + mobilelab
+  // Expresión: total = manuales + maleta + mobilelab
   const TOTAL = ['+', ['get','manuales'], ['+', ['get','maleta'], ['get','mobilelab']]];
 
-  function addLayersFromSource(sourceId, needsSourceLayer) {
-    const layerOpts = { id:'centros-circulos', type:'circle', source:sourceId, paint:{
-      'circle-color':'#E2D2F6',
-      'circle-stroke-color':'#201245',
-      'circle-stroke-width':1.5,
-      'circle-radius': ['interpolate',['linear'], TOTAL, 0,10, 300,16, 800,22, 1600,30, 2600,40]
-    }};
-    const textOpts = { id:'centros-texto', type:'symbol', source:sourceId, layout:{
-      'text-field':['to-string', TOTAL],
-      'text-size':13,'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-      'text-allow-overlap':true,'text-ignore-placement':true
-    }, paint:{'text-color':'#201245','text-halo-color':'#fff','text-halo-width':0.6} };
-    if (needsSourceLayer) {
-      layerOpts['source-layer'] = 'regiones_chile_centros-3ktyh3';
-      textOpts['source-layer']  = 'regiones_chile_centros-3ktyh3';
-    }
-    map.addLayer(layerOpts);
-    map.addLayer(textOpts);
+  map.on('load', () => {
+    // Fuente: tu GeoJSON publicado en GitHub Pages (URL ABSOLUTA)
+    map.addSource('regiones-centros', {
+      type: 'geojson',
+      data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
+    });
 
-    // Popup
-    map.on('click','centros-circulos',(e)=>{
+    // Círculos lilas (radio proporcional al total)
+    map.addLayer({
+      id: 'centros-circulos',
+      type: 'circle',
+      source: 'regiones-centros',
+      paint: {
+        'circle-color': '#E2D2F6',
+        'circle-stroke-color': '#201245',
+        'circle-stroke-width': 1.5,
+        'circle-radius': [
+          'interpolate', ['linear'], TOTAL,
+          0, 10,
+          300, 16,
+          800, 22,
+          1600, 30,
+          2600, 40
+        ]
+      }
+    });
+
+    // Número total centrado
+    map.addLayer({
+      id: 'centros-texto',
+      type: 'symbol',
+      source: 'regiones-centros',
+      layout: {
+        'text-field': ['to-string', TOTAL],
+        'text-size': 13,
+        'text-font': ['Open Sans Bold','Arial Unicode MS Bold'],
+        'text-allow-overlap': true,
+        'text-ignore-placement': true
+      },
+      paint: {
+        'text-color': '#201245',
+        'text-halo-color': '#FFFFFF',
+        'text-halo-width': 0.6
+      }
+    });
+
+    // Popup con tus colores
+    map.on('click', 'centros-circulos', (e) => {
       const p = e.features[0].properties;
-      const nombre = p['región'];                   // <- propiedad exacta
+      const nombre = p['región'];
       const man = Number(p['manuales']||0);
       const mal = Number(p['maleta']||0);
       const mob = Number(p['mobilelab']||0);
+
       const html = `
         <div class="ux-popup">
           <h2>${nombre}</h2>
@@ -81,33 +110,13 @@
             </div>
           </div>
         </div>`;
-      new mapboxgl.Popup({offset:16, closeButton:true, maxWidth:'860px'})
+      new mapboxgl.Popup({ offset:16, closeButton:true, maxWidth:'860px' })
         .setLngLat(e.lngLat).setHTML(html).addTo(map);
     });
+
     map.on('mouseenter','centros-circulos',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','centros-circulos',()=>map.getCanvas().style.cursor='');
-  }
-
-  map.on('load', async ()=>{
-    // 1) Intentar cargar el .geojson del repo
-    let usedFallback = false;
-    try {
-      const resp = await fetch('regiones_chile_centros.geojson', {cache:'no-cache'});
-      if (!resp.ok) throw new Error('No está en /root o nombre distinto');
-      const data = await resp.json();
-      map.addSource('regiones-centros', { type:'geojson', data });
-      addLayersFromSource('regiones-centros', /*needsSourceLayer*/ false);
-    } catch (err) {
-      usedFallback = true;
-      // 2) Fallback: tileset de Mapbox
-      map.addSource('regiones-centros-tiles', { type:'vector', url:'mapbox://vhirschberg.69tq4hif' });
-      addLayersFromSource('regiones-centros-tiles', /*needsSourceLayer*/ true);
-    }
-    if (usedFallback) document.getElementById('warn').style.display = 'block';
   });
-
-  // Loggear errores en consola (útil si algo sale mal)
-  map.on('error', e => { console.error('Mapbox error:', e && e.error || e); });
 </script>
 </body>
 </html>
