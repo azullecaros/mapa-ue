@@ -1,75 +1,64 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>Mapa Universo Expansivo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Mapbox GL JS CSS -->
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-
-  <style>
-    body { margin:0; padding:0; font-family: "DIN", sans-serif; }
-    #map { position:absolute; top:0; bottom:0; width:100%; }
-    .marker-label {
-      color: white;
-      font-size: 14px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 30px;
-    }
-  </style>
+<meta charset="utf-8">
+<title>Mapa Universo Expansivo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 0; }
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<!-- Mapbox GL JS Script -->
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-
 <script>
-  // TOKEN DE MAPBOX
-  mapboxgl.accessToken = 'TU_TOKEN_DE_MAPBOX';
+// Token de acceso de Mapbox
+mapboxgl.accessToken = 'pk.eyJ1IjoidmhpcnNjaGJlcmciLCJhIjoiY21lYmh4NDB4MG85bDJrcHdib21veGNubiJ9.WyoHoI8fXYX3VkEb42vKXg';
 
-  // Inicializar el mapa
-  const map = new mapboxgl.Map({
+// Inicializar el mapa
+const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11',
+    style: 'mapbox://styles/mapbox/streets-v11',
     center: [-70.6693, -33.4489], // Santiago, Chile
     zoom: 4
-  });
+});
 
-  // Cargar GeoJSON desde GitHub Pages
-  fetch('https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson')
-    .then(response => response.json())
-    .then(data => {
-      data.features.forEach(feature => {
-        const props = feature.properties;
-        const coords = feature.geometry.coordinates;
-        const total = props.manuales + props.maleta + props.mobilelab;
-
-        // Crear elemento HTML para el marcador
-        const el = document.createElement('div');
-        el.style.width = '40px';
-        el.style.height = '40px';
-        el.style.backgroundColor = '#0074D9';
-        el.style.borderRadius = '50%';
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.color = '#fff';
-        el.style.fontWeight = 'bold';
-        el.innerText = total;
-
-        // Agregar marcador al mapa
-        new mapboxgl.Marker(el)
-          .setLngLat(coords)
-          .setPopup(new mapboxgl.Popup().setHTML(`<strong>${props["región"]}</strong><br>Manuales: ${props.manuales}<br>Maleta: ${props.maleta}<br>MobileLab: ${props.mobilelab}`))
-          .addTo(map);
-      });
+// Cargar datos GeoJSON desde el repositorio
+map.on('load', () => {
+    map.addSource('centros', {
+        type: 'geojson',
+        data: 'https://azullecaros.github.io/mapa-ue/regiones_chile_centros.geojson'
     });
+
+    map.addLayer({
+        id: 'centros-layer',
+        type: 'circle',
+        source: 'centros',
+        paint: {
+            'circle-radius': 6,
+            'circle-color': '#ff0000'
+        }
+    });
+
+    // Popup con información
+    map.on('click', 'centros-layer', (e) => {
+        const props = e.features[0].properties;
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(`<strong>${props["región"]}</strong><br>Manuales: ${props.manuales}<br>Maleta: ${props.maleta}<br>MobileLab: ${props.mobilelab}`)
+            .addTo(map);
+    });
+
+    map.on('mouseenter', 'centros-layer', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'centros-layer', () => { map.getCanvas().style.cursor = ''; });
+});
 </script>
 
 </body>
 </html>
+
 
